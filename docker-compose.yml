@@ -1,0 +1,11 @@
+version: "3"
+services:
+  w-seg:
+    image: w_seg-image
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: w_seg_container
+
+    volumes:
+      - .:/workspace:cached
