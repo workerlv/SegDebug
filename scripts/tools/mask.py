@@ -3,19 +3,15 @@ import torch
 import cv2
 
 
-class CustomMask:
-    def __init__(self, image_width: int, image_height: int):
-        self.image_width = image_width
-        self.image_height = image_height
-        self.mask = np.zeros((self.image_height, self.image_width), dtype=np.uint8)
+class Mask:
+    def __init__(self, segmentation_mask):
+        self.mask = segmentation_mask
+        self.check_if_mask_binary()
 
-    def add_mask_with_circle(self, radius: int, x_cord: int, y_cord: int):
-        self.mask = cv2.circle(self.mask, (x_cord, y_cord), radius, 1, -1)
-
-    def add_mask_with_rectangle(
-        self, width: int, height: int, x_cord: int, y_cord: int
-    ):
-        self.mask[y_cord : y_cord + height, x_cord : x_cord + width] = 1
+    def check_if_mask_binary(self):
+        if np.max(self.mask) > 1:
+            self.mask = self.mask / 255
+            self.mask = self.mask.astype(np.uint8)
 
     def get_normalized_mask(self):
         return self.mask * 255
@@ -36,7 +32,7 @@ class CustomMask:
         Returns:
             float: Percentage of overlap between the two masks.
         """
-        if not isinstance(other, CustomMask):
+        if not isinstance(other, Mask):
             raise ValueError("Operand must be an instance of CustomMask.")
 
         # Ensure the masks are of the same shape

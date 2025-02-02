@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 
 
 def create_segmentation_overlay(gt_mask, pred_mask):
@@ -36,3 +37,31 @@ def create_segmentation_overlay(gt_mask, pred_mask):
     overlay[false_positives == 1] = [0, 0, 255]
 
     return overlay
+
+
+def create_geen_overlay(image, mask, alpha=0.7):
+    """
+    Applies a green overlay on the original image using the given segmentation mask.
+
+    Parameters:
+        image (numpy.ndarray): Original image (BGR format).
+        mask (numpy.ndarray): Segmentation mask (grayscale or binary format, same width/height as image).
+        alpha (float): Transparency of the overlay (0.0 to 1.0).
+
+    Returns:
+        numpy.ndarray: Image with green overlay applied.
+    """
+    # Ensure mask is binary
+    mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)[1]
+
+    # Create an all-green image
+    green_overlay = np.zeros_like(image, dtype=np.uint8)
+    green_overlay[:, :] = (0, 255, 0)
+
+    # Apply the mask to the green overlay
+    green_overlay = cv2.bitwise_and(green_overlay, green_overlay, mask=mask)
+
+    # Blend the original image and the green overlay
+    output = cv2.addWeighted(image, 1 - alpha, green_overlay, alpha, 0)
+
+    return output

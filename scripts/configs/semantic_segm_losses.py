@@ -8,6 +8,9 @@ class Const:
 
 
 class Config:
+    # Use example data
+    use_example_data: bool = True
+
     # Ground truth
     gt_figure_width: int = 0
     gt_figure_height: int = 0
